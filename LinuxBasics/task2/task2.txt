@@ -1,0 +1,38 @@
+vagrant@gbLinux:~$ mkdir students mentors
+vagrant@gbLinux:~$ ls
+mentors  students
+vagrant@gbLinux:~$ touch students/students_list.txt
+vagrant@gbLinux:~$ touch mentors/mentors_list.txt
+vagrant@gbLinux:~$ nano students/students_list.txt
+# скопировал некий спиской студентов со страницы с уроком по Линукс
+vagrant@gbLinux:~$ nano mentors/mentors_list.txt
+# скопировал имя наставника
+vagrant@gbLinux:~$ mv mentors/mentors_list.txt students/
+vagrant@gbLinux:~$ cd students/
+vagrant@gbLinux:~/students$ ls -lh
+total 8.0K
+-rw-rw-r-- 1 vagrant vagrant   36 May 27 13:27 mentors_list.txt
+-rw-rw-r-- 1 vagrant vagrant 1.3K May 27 13:26 students_list.txt
+vagrant@gbLinux:~/students$ cd ../mentors/
+vagrant@gbLinux:~/mentors$ ls -lh
+vagrant@gbLinux:~/mentors$ cd ..
+vagrant@gbLinux:~$ rm -r mentors/
+vagrant@gbLinux:~$ ls -lh
+total 4.0K
+drwxrwxr-x 2 vagrant vagrant 4.0K May 27 13:30 students
+vagrant@gbLinux:~$ mv students/ students_and_mentors/
+vagrant@gbLinux:~$ ls -lh
+total 4.0K
+drwxrwxr-x 2 vagrant vagrant 4.0K May 27 13:30 students_and_mentors
+vagrant@gbLinux:~$ rm -r students_and_mentors/
+vagrant@gbLinux:~$ ls -lh
+total 0
+
+=====
+SSH-подключение
+Преамбула. У меня Линукс на виртуальной машине запускается связкой Vagrant+VirtualBox,
+что уже дает возможность штатного подключения к ВМ по ssh через vagrant ssh.
+Для выполнения задания я сделал следующее:
+1. На хост машине сгенерировал новую пару ssh-ключей
+2. Командой ssh-copy-id закинул публичный ключ на ВМ, привязав его к пользователю vagrant. Пароль пользователя совпадает с его именем.
+3. Проверил подключение командой ssh vagrant@192.168.1.100. Публичный адрес ВМ указан мною в VagrantFile.

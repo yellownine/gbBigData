@@ -1,0 +1,85 @@
+1. Управление пользователями:
+vagrant@gbLinux:~$ sudo useradd gbLinux
+vagrant@gbLinux:~$ cat /etc/passwd | grep gbLinux
+gbLinux:x:1002:1002::/home/gbLinux:/bin/sh
+vagrant@gbLinux:~$ sudo deluser --remove-home gbLinux
+Looking for files to backup/remove ...
+Removing user `gbLinux' ...
+Warning: group `gbLinux' has no more members.
+Done.
+vagrant@gbLinux:~$ cat /etc/passwd | grep gbLinux
+vagrant@gbLinux:~$
+
+2. Управление группами:
+vagrant@gbLinux:~$ sudo groupadd gbLinuxG
+vagrant@gbLinux:~$ sudo groupadd gbPythonG
+vagrant@gbLinux:~$ cat /etc/group | grep gb
+gbUser:x:1001:
+gbLinuxG:x:1002:
+gbPythonG:x:1003:
+vagrant@gbLinux:~$ sudo useradd gbLinux --gid 1002
+vagrant@gbLinux:~$ cat /etc/passwd | grep gbLinux
+gbLinux:x:1002:1002::/home/gbLinux:/bin/sh
+vagrant@gbLinux:~$ sudo usermod -g gbPythonG gbLinux
+vagrant@gbLinux:~$ cat /etc/passwd | grep gbLinux
+gbLinux:x:1002:1003::/home/gbLinux:/bin/sh
+...
+vagrant@gbLinux:~$ groups gbLinux
+gbLinux : gbLinuxG gbPythonG
+vagrant@gbLinux:~$ sudo usermod -G gbLinuxG,gbPythonG,gbUser gbLinux
+vagrant@gbLinux:~$ groups gbLinux
+gbLinux : gbLinuxG gbUser gbPythonG
+vagrant@gbLinux:~$ sudo usermod -aG sudo gbLinux
+vagrant@gbLinux:~$ groups gbLinux
+gbLinux : gbLinuxG sudo gbUser gbPythonG
+vagrant@gbLinux:~$ sudo gpasswd -d gbLinux sudo
+Removing user gbLinux from group sudo
+vagrant@gbLinux:~$ groups gbLinux
+gbLinux : gbLinuxG gbUser gbPythonG
+
+3. Создать пользователя с правами суперпользователя. Проверить результат.
+vagrant@gbLinux:~$ sudo adduser sudo2
+Adding user `sudo2' ...
+Adding new group `sudo2' (1004) ...
+Adding new user `sudo2' (1003) with group `sudo2' ...
+Creating home directory `/home/sudo2' ...
+Copying files from `/etc/skel' ...
+New password:
+Retype new password:
+passwd: password updated successfully
+Changing the user information for sudo2
+Enter the new value, or press ENTER for the default
+	Full Name []:
+	Room Number []:
+	Work Phone []:
+	Home Phone []:
+	Other []:
+Is the information correct? [Y/n] y
+vagrant@gbLinux:~$ sudo usermod -aG sudo sudo2
+vagrant@gbLinux:~$ id sudo2
+uid=1003(sudo2) gid=1004(sudo2) groups=1004(sudo2),27(sudo)
+vagrant@gbLinux:~$ su - sudo2
+Password:
+To run a command as administrator (user "root"), use "sudo <command>".
+See "man sudo_root" for details.
+sudo2@gbLinux:~$ sudo visudo
+видим, что все члены группы sudo могут все и везде
+%sudo   ALL=(ALL:ALL) ALL
+
+4. * Используя дополнительные материалы, выдать одному из созданных пользователей право на выполнение ряда команд, требующих прав суперпользователя (команды выбираем на своё усмотрение).
+Разрешим пользователю gbLinux удалять пользователей без пароля. Редактируем /etc/sudoers через visudo.
+Добавляем алиас команды
+Cmnd_Alias DELUSER_CMDS = /usr/bin/apt
+Разрешаем этот алиас для пользователя
+gbLinux ALL=(ALL) NOPASSWD: DELUSER_CMDS
+Меняем пользователя
+sudo2@gbLinux:/home/vagrant$ su gbLinux
+Password:
+$ /bin/bash
+Удаляем sudo2
+gbLinux@gbLinux:/home/vagrant$ sudo deluser sudo2
+Removing user `sudo2' ...
+Warning: group `sudo2' has no more members.
+userdel: user sudo2 is currently used by process 1270
+/usr/sbin/deluser: `/sbin/userdel sudo2' returned error code 8. Exiting.
+Этот пользователь не может быть пока удален.
